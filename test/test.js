@@ -1,19 +1,28 @@
 void function(root){
     var boxes = require('../')
-        , tape = require('tape')
+        , expect = require('expect.js')
         , fs = require('fs')
-        , tpl = fs.readFileSync(__dirname +'/tpl.hamlc', 'utf8')
-        , box = boxes.make(tpl)
+        , tpl1 = '#test1\n  %p= @content'
+        , tpl2 = '#test2 != @content'
+        , tpl3 = '#test3 != @content'
+        , box1 = boxes.make(tpl1)
+        , box2 = boxes.make(tpl2)
+        , box3 = boxes.make(tpl3)
         ;
 
-    box.content = 'whatever'
 
-    console.log(root.document)
+    describe('boxes', function(){
+        it('expects to compile the variable into the template', function(){
+            box1.content = 'whatever'
+            expect(box1+'').to.be('<div id=\'test1\'>\n  <p>whatever</p>\n</div>')
+        })
 
-    tape('compile', function(t){
-        t.equal(box+'', '<div id=\'test\'>\n  <p>whatever</p>\n</div>')
-        t.end()
+        it('expects boxes to be embeddadle ', function(){
+            box2.content = box3
+            box3.content = box1
+            box1.content = 'dafuq'
+            expect(box2+'').to.be('<div id=\'test2\'><div id=\'test3\'><div id=\'test1\'>\n  <p>dafuq</p>\n</div></div></div>')
+        })
     })
-
 
 }(this)
