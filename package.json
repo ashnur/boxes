@@ -4,13 +4,12 @@
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test",
+    "test": "mocha test/test.js",
     "prepublish": "npm test"
   },
   "dependencies": {
     "totemizer": "~0.0.2",
-    "bean": "~1.0.3",
-    "haml-coffee": "~1.11.1"
+    "bean": "~1.0.3"
   },
   "devDependencies": {
     "mocha": "*",

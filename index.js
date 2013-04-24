@@ -1,11 +1,9 @@
 void function(root){
     var viral = require('viral')
-        , hamlcoffee = require('haml-coffee')
+        , haml= require('haml')
         , boxes = viral.extend({
-            init: function(tpl){
-                this.tpl = hamlcoffee.compile(tpl)
-            }
-            , toString: function(){ return this.tpl(this) }
+            init: function(tpl){ this.tpl = haml.optimize(haml.compile(tpl))}
+            , toString: function(){ return haml.execute(this.tpl, this) }
 
         })
         ;
