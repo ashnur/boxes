@@ -8,9 +8,14 @@ void function(root){
         })
         ;
 
+    window.addEventListener('load', function(){
+
+    })
+
     if ( module !== undefined && module.exports ) {
         module.exports = boxes
     } else {
         root.factory = boxes
     }
+
 }(this)

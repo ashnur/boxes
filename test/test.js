@@ -24,6 +24,9 @@ void function(root){
             expect(box2+'').to.be('<div id="test2"><div id="test3"><div id="test1"><p>dafuq</p></div></div></div>')
         })
 
+        it('expects boxes to update the dom when content is changed', function(){
+
+        })
     })
 
 }(this)
