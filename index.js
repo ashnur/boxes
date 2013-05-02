@@ -1,19 +1,42 @@
 void function(root){
 
-    function toString(box, locals){
-        return haml.execute(box.tpl, box, locals)
+    function toString(box){
+        return elements(box.self).map(function(el){ return el.outerHTML }).join('')
     }
 
-    function element(box, force){
-        if ( force || !box.self ){
-            box.self = bonzo.create(toString(box))
-        }
-        return box.self
+    function elements(els){
+        return els.map(function(el){return el})
     }
-
     function draw(box){
         var elem = element(box)
         bonzo(elem).replaceWith(element(box, true))
+    }
+
+    function change(box, updates){
+        u.forEachOwn(updates, function(selector){
+            var parts = selector.match(/(.*)(_(text|html))/)
+            var elements = qwery(parts[1], box.self)
+            var id = 'asldjkwquealkfmasivyyzxyciweooruaksdjaswaljd'
+
+            if ( ! elements.length ) {
+                elements = qwery('#'+id+' > '+parts[1], bonzo(bonzo.create('<div>')).attr('id', id).append(box.self))
+            }
+
+            var value = updates[selector]
+
+            if ( elements.length ) {
+                switch ( parts[2] ) {
+                    case '_text':
+                        bonzo(elements).text(value)
+                        break
+                    case '_html':
+                        bonzo(elements).html(domify(value))
+                        break
+                    default:
+                        bonzo(elements).html(domify(value))
+                }
+            }
+        })
     }
 
     function set(box, name, value){
@@ -21,27 +44,29 @@ void function(root){
         bean.fire(boxes, 'draw', [box])
     }
 
-    function appendTo(box, elem){ bonzo(elem).append(element(box)) }
-    function prependTo(box, elem){ bonzo(elem).prepend(element(box)) }
+    function appendTo(box, elem){ bonzo(box.self).appendTo(elem) }
+    function prependTo(box, elem){ dom(box.self).prependTo(elem) }
 
     var viral = require('viral')
-        , haml= require('haml')
         , u = require('totemizer')
+        , bonzo = require('bonzo')
+        , qwery = require('qwery')
+        , domify = require('domify')
         , boxes = viral.extend({
-            init: function(tpl){ this.tpl = haml.optimize(haml.compile(tpl)) }
+            init: function(tpl){
+                this.self = bonzo(domify(tpl))
+            }
             , toString: u.enslave(toString)
-            , element: u.enslave(element)
-            , set: u.enslave(set)
+            , change: u.enslave(change)
             , draw: u.enslave(draw)
             , appendTo: u.enslave(appendTo)
+            , prependTo: u.enslave(prependTo)
         })
-        , bonzo = require('bonzo')
         , bean = require('bean')
         ;
 
-    bean.on(boxes, 'draw', function(box){
-        draw(box)
-    })
+
+    bean.on(boxes, 'draw', draw)
 
     if ( module !== undefined && module.exports ) {
         module.exports = boxes
