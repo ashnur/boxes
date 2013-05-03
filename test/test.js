@@ -13,26 +13,21 @@ void function(root){
 
     describe('boxes', function(){
         it('expects to compile the variable into the template', function(){
-            box1.change({'#test1 p _text':'whatever'})
+            box1.change({'#test1 p':{ _text: 'whatever'}})
             expect(box1+'').to.be('<div id="test1"><p>whatever</p></div>')
         })
 
         it('expects boxes to be embeddadle ', function(){
-            box1.change({'#test1 p _text':'dafuq'})
-            box3.change({'#test3 _html':box1.toString()})
-            box2.change({'#test2 _html':box3.toString()})
+            box1.change({'#test1 p':{_text:'dafuq'}})
+            box3.change({'#test3':{_node:box1.self}})
+            box2.change({'#test2':{_node:box3.self}})
             expect(box2+'').to.be('<div id="test2"><div id="test3"><div id="test1"><p>dafuq</p></div></div></div>')
         })
 
         it('expects boxes to be added to the dom', function(done){
-            box1.change({'#test1 p _text':'whatever'})
+            box1.change({'#test1 p':{ _text:'whatever'}})
             box1.appendTo(document.body)
             expect(document.getElementById('test1').outerHTML).to.be('<div id="test1"><p>whatever</p></div>')
-            done()
-        })
-        it('expects boxes to update the dom when content is changed', function(done){
-            box1.change({'#test1 p _text':'dafuq'})
-            expect(document.getElementById('test1').outerHTML).to.be('<div id="test1"><p>dafuq</p></div>')
             done()
         })
     })

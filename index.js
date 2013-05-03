@@ -14,27 +14,32 @@ void function(root){
 
     function change(box, updates){
         u.forEachOwn(updates, function(selector){
-            var parts = selector.match(/(.*)(_(text|html))/)
-            var elements = qwery(parts[1], box.self)
-            var id = 'asldjkwquealkfmasivyyzxyciweooruaksdjaswaljd'
+            var elements = qwery(selector, box.self)
+                , id = 'asldjkwquealkfmasivyyzxyciweooruaksdjaswaljd'
 
             if ( ! elements.length ) {
-                elements = qwery('#'+id+' > '+parts[1], bonzo(bonzo.create('<div>')).attr('id', id).append(box.self))
+                elements = qwery('#'+id+' > '+selector, bonzo(bonzo.create('<div>')).attr('id', id).append(box.self))
             }
 
-            var value = updates[selector]
-
             if ( elements.length ) {
-                switch ( parts[2] ) {
-                    case '_text':
-                        bonzo(elements).text(value)
-                        break
-                    case '_html':
-                        bonzo(elements).html(domify(value))
-                        break
-                    default:
-                        bonzo(elements).html(domify(value))
-                }
+                elements = bonzo(elements)
+                u.forEachOwn(updates[selector], function(name){
+                    var value = updates[selector][name]
+                    switch ( name ) {
+                        case '_text':
+                            elements.text(value)
+                            break
+                        case '_html':
+                            elements.html(domify(value))
+                            break
+                        case '_node':
+                            elements.empty()
+                            elements.append(value)
+                            break
+                        default:
+                            elements.attr(name, domify(value))
+                    }
+                })
             }
         })
     }
