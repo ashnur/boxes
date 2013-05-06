@@ -1,4 +1,5 @@
 void function(root){
+    'use strict'
 
     function toString(box){
         return elements(box.self).map(function(el){ return el.outerHTML }).join('')
@@ -7,20 +8,19 @@ void function(root){
     function elements(els){
         return els.map(function(el){return el})
     }
-    function draw(box){
-        var elem = element(box)
-        bonzo(elem).replaceWith(element(box, true))
+
+    function find(box, selector){
+        var elements = qwery(selector, box.self)
+            , id = 'asldjkwquealkfmasivyyzxyciweooruaksdjaswaljd'
+        if ( ! elements.length ) {
+            elements = qwery('#'+id+' > '+selector, bonzo(bonzo.create('<div>')).attr('id', id).append(box.self))
+        }
+        return elements
     }
 
     function change(box, updates){
         u.forEachOwn(updates, function(selector){
-            var elements = qwery(selector, box.self)
-                , id = 'asldjkwquealkfmasivyyzxyciweooruaksdjaswaljd'
-
-            if ( ! elements.length ) {
-                elements = qwery('#'+id+' > '+selector, bonzo(bonzo.create('<div>')).attr('id', id).append(box.self))
-            }
-
+            var elements = find(box, selector)
             if ( elements.length ) {
                 elements = bonzo(elements)
                 u.forEachOwn(updates[selector], function(name){
@@ -44,34 +44,23 @@ void function(root){
         })
     }
 
-    function set(box, name, value){
-        box[name] = value
-        bean.fire(boxes, 'draw', [box])
-    }
-
     function appendTo(box, elem){ bonzo(box.self).appendTo(elem) }
-    function prependTo(box, elem){ dom(box.self).prependTo(elem) }
+    function prependTo(box, elem){ bonzo(box.self).prependTo(elem) }
 
     var viral = require('viral')
         , u = require('totemizer')
-        , bonzo = require('bonzo')
-        , qwery = require('qwery')
         , domify = require('domify')
+        , qwery = require('qwery')
+        , bonzo = require('bonzo')
         , boxes = viral.extend({
-            init: function(tpl){
-                this.self = bonzo(domify(tpl))
-            }
+            init: function(tpl){ this.self = bonzo(domify(tpl)) }
             , toString: u.enslave(toString)
             , change: u.enslave(change)
-            , draw: u.enslave(draw)
             , appendTo: u.enslave(appendTo)
             , prependTo: u.enslave(prependTo)
+            , find: u.enslave(find)
         })
-        , bean = require('bean')
-        ;
 
-
-    bean.on(boxes, 'draw', draw)
 
     if ( module !== undefined && module.exports ) {
         module.exports = boxes
